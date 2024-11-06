@@ -1,0 +1,375 @@
+<!-- <!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working Capital Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --secondary: #475569;
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --text-light: #fff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            color: var(--text-light);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header h1 {
+            color: var(--text-light);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 1rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+            font-weight: 500;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        button {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .results {
+            margin-top: 2rem;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container {
+            margin-top: 2rem;
+            height: 300px;
+            position: relative;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Custom Chart Styles */
+        #resultsChart {
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Working Capital Calculator</h1>
+            <p>Calculate MPBF (Maximum Permissible Bank Finance) and DP (Drawing Power)</p>
+        </div>
+
+        <div class="calculator-grid">
+            <div class="card">
+                <div class="input-group">
+                    <label for="tca">Total Current Assets (TCA)</label>
+                    <input type="number" id="tca" placeholder="Enter TCA value">
+                </div>
+                <div class="input-group">
+                    <label for="ocl">Other Current Liabilities (OCL)</label>
+                    <input type="number" id="ocl" placeholder="Enter OCL value">
+                </div>
+                <button onclick="calculateResults()">Calculate</button>
+
+                <div class="results">
+                    <div class="result-item">
+                        <span class="result-label">Working Capital Gap</span>
+                        <span class="result-value" id="wcg">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Minimum Stipulated NWC</span>
+                        <span class="result-value" id="min-nwc">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">MPBF</span>
+                        <span class="result-value" id="mpbf">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">DP</span>
+                        <span class="result-value" id="dp">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="chart-container">
+                    <canvas id="resultsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class WorkingCapitalCalculator {
+            constructor(tca, ocl) {
+                this.tca = tca;
+                this.ocl = ocl;
+            }
+
+            calculateMpbf() {
+                const workingCapitalGap = this.tca - this.ocl;
+                const minimumStipulatedNwc = 0.25 * this.tca;
+                const actualNetWorkingCapital = this.tca - this.ocl;
+                const item6 = workingCapitalGap - minimumStipulatedNwc;
+                const item7 = workingCapitalGap - actualNetWorkingCapital;
+                return {
+                    mpbf: Math.min(item6, item7),
+                    workingCapitalGap,
+                    minimumStipulatedNwc
+                };
+            }
+
+            calculateDp() {
+                const margins = {
+                    "Raw Material": this.tca * 0.25,
+                    "Other Consumable Spares": this.tca * 0.25,
+                    "Stock-in-process": this.tca * 0.25,
+                    "Finished Goods": this.tca * 0.25,
+                    "Domestic Receivables": this.tca * 0.40,
+                    "Export Receivables": this.tca * 0.40
+                };
+
+                const creditors = {
+                    "Creditors": this.tca * 0.40
+                };
+
+                const totalMarginA = Object.values(margins).reduce((a, b) => a + b, 0);
+                const totalCreditorsB = Object.values(creditors).reduce((a, b) => a + b, 0);
+                return totalMarginA - totalCreditorsB;
+            }
+        }
+
+        let resultsChart = null;
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(value);
+        }
+
+        function updateChart(data) {
+            const ctx = document.getElementById('resultsChart').getContext('2d');
+            
+            if (resultsChart) {
+                resultsChart.destroy();
+            }
+
+            resultsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Working Capital Gap', 'Min Stipulated NWC', 'MPBF', 'DP'],
+                    datasets: [{
+                        label: 'Working Capital Analysis',
+                        data: [
+                            data.workingCapitalGap,
+                            data.minimumStipulatedNwc,
+                            data.mpbf,
+                            data.dp
+                        ],
+                        backgroundColor: [
+                            'rgba(255, 255, 255, 0.7)',
+                            'rgba(255, 255, 255, 0.7)',
+                            'rgba(255, 255, 255, 0.7)',
+                            'rgba(255, 255, 255, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 255, 255, 0.9)',
+                            'rgba(255, 255, 255, 0.9)',
+                            'rgba(255, 255, 255, 0.9)',
+                            'rgba(255, 255, 255, 0.9)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'rgba(255, 255, 255, 0.9)'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.9)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.9)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function calculateResults() {
+            const tca = parseFloat(document.getElementById('tca').value);
+            const ocl = parseFloat(document.getElementById('ocl').value);
+
+            if (isNaN(tca) || isNaN(ocl)) {
+                alert('Please enter valid numbers for TCA and OCL');
+                return;
+            }
+
+            const calculator = new WorkingCapitalCalculator(tca, ocl);
+            const { mpbf, workingCapitalGap, minimumStipulatedNwc } = calculator.calculateMpbf();
+            const dp = calculator.calculateDp();
+
+            document.getElementById('wcg').textContent = formatCurrency(workingCapitalGap);
+            document.getElementById('min-nwc').textContent = formatCurrency(minimumStipulatedNwc);
+            document.getElementById('mpbf').textContent = formatCurrency(mpbf);
+            document.getElementById('dp').textContent = formatCurrency(dp);
+
+            updateChart({
+                workingCapitalGap,
+                minimumStipulatedNwc,
+                mpbf,
+                dp
+            });
+        }
+    </script>
+</body>
+</html>
+ -->
